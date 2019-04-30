@@ -22,6 +22,7 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule {
 
   private static final String E_CANCELLED = "E_CANCELLED";
   private static final String E_FAILED = "E_FAILED";
+  private static final String E_ACTIVITY_DOES_NOT_EXIST = "E_ACTIVITY_DOES_NOT_EXIST";
 
   private Promise mPromise;
 
@@ -58,13 +59,19 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void openActivity(String action, String data, final Promise promise) {
+  public void openActivity(String action, String data, ReadableMap extras, final Promise promise) {
+    Activity currentActivity = getReactApplicationContext().getCurrentActivity();
+    if (currentActivity == null) {
+      promise.reject("E_ACTIVITY_DOES_NOT_EXIST", "Activity doesn't exist");
+      return;
+    }
+
     mPromise = promise;
+
     try {
-      Activity activity = getReactApplicationContext().getCurrentActivity();
       Intent intent = new Intent(action, Uri.parse(data));
-      // intent.putExtras(Arguments.toBundle(data));
-      activity.startActivityForResult(intent, 42); // requestCode = 42
+      intent.putExtras(Arguments.toBundle(extras));
+      currentActivity.startActivityForResult(intent, 42); // requestCode = 42
     } catch (Exception e) {
       mPromise.reject(E_FAILED, e);
       mPromise = null;
