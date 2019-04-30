@@ -1,6 +1,10 @@
 
 package com.reactlibrary;
 
+import android.app.Activity;
+import android.content.Intent;
+
+import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.ActivityEventListener;
 import com.facebook.react.bridge.ReactApplicationContext;
 import com.facebook.react.bridge.ReactContextBaseJavaModule;
@@ -12,7 +16,7 @@ import com.facebook.react.bridge.ReadableMap;
 import com.facebook.react.bridge.WritableMap;
 import com.facebook.react.bridge.WritableNativeMap;
 
-public class RNActivityIntentModule extends ReactContextBaseJavaModule implements ActivityEventListener  {
+public class RNActivityIntentModule extends ReactContextBaseJavaModule {
 
   private static final String E_CANCELLED = "E_CANCELLED";
   private static final String E_FAILED = "E_FAILED";
@@ -28,15 +32,14 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule implement
         } else if (resultCode == Activity.RESULT_OK) {
           if (data != null) {
             mPromise.resolve(Arguments.makeNativeMap(data.getExtras()));
-          }
-          else {
-            mPromise.resolve(null)
+          } else {
+            mPromise.resolve(null);
           }
         }
         mPromise = null;
       }
     }
-  }
+  };
 
   public RNActivityIntentModule(ReactApplicationContext reactContext) {
     super(reactContext);
@@ -56,11 +59,10 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule implement
       Intent intent = new Intent(action);
       intent.putExtras(Arguments.toBundle(data));
       activity.startActivityForResult(intent, 42); // requestCode = 42
-    }
-    catch (Exception e) {
+    } catch (Exception e) {
       mPromise.reject(E_FAILED, e);
       mPromise = null;
     }
-    
+
   }
 }
