@@ -22,7 +22,7 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule implement
 
   private Promise mPromise;
 
-  private final ActivityEventListener mActivityEventListener = new BaseActivityEventListener() {
+  private final ActivityEventListener mActivityResultListener = new BaseActivityEventListener() {
     @Override
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
       if (mPromise != null) {
