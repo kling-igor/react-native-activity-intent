@@ -3,6 +3,8 @@ package com.activityintent;
 
 import android.app.Activity;
 import android.content.Intent;
+import android.net.Uri;
+import android.util.Log;
 
 import com.facebook.react.bridge.BaseActivityEventListener;
 import com.facebook.react.bridge.ActivityEventListener;
@@ -28,10 +30,14 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule {
     public void onActivityResult(Activity activity, int requestCode, int resultCode, Intent data) {
       if (mPromise != null) {
         if (resultCode == Activity.RESULT_CANCELED) {
-          mPromise.reject(E_CANCELLED, "Cancelled...");
+          mPromise.reject(E_CANCELLED, "Cancelled");
         } else if (resultCode == Activity.RESULT_OK) {
           if (data != null) {
-            mPromise.resolve(Arguments.makeNativeMap(data.getExtras()));
+            WritableMap result = new WritableNativeMap();
+            result.putInt("code", resultCode);
+            result.putString("data", data.getDataString());
+            result.putMap("extras", Arguments.makeNativeMap(data.getExtras()));
+            mPromise.resolve(result);
           } else {
             mPromise.resolve(null);
           }
@@ -52,17 +58,16 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule {
   }
 
   @ReactMethod
-  public void openActivity(String action, ReadableMap data, final Promise promise) {
+  public void openActivity(String action, String data, final Promise promise) {
     mPromise = promise;
     try {
       Activity activity = getReactApplicationContext().getCurrentActivity();
-      Intent intent = new Intent(action);
-      intent.putExtras(Arguments.toBundle(data));
+      Intent intent = new Intent(action, Uri.parse(data));
+      // intent.putExtras(Arguments.toBundle(data));
       activity.startActivityForResult(intent, 42); // requestCode = 42
     } catch (Exception e) {
       mPromise.reject(E_FAILED, e);
       mPromise = null;
     }
-
   }
 }
