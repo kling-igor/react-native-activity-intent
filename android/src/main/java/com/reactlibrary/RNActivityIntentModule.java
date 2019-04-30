@@ -17,9 +17,6 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule implement
   private static final String E_CANCELLED = "E_CANCELLED";
   private static final String E_FAILED = "E_FAILED";
 
-  
-  private final ReactApplicationContext reactContext;
-
   private Promise mPromise;
 
   private final ActivityEventListener mActivityResultListener = new BaseActivityEventListener() {
@@ -43,7 +40,6 @@ public class RNActivityIntentModule extends ReactContextBaseJavaModule implement
 
   public RNActivityIntentModule(ReactApplicationContext reactContext) {
     super(reactContext);
-    this.reactContext = reactContext;
     reactContext.addActivityEventListener(mActivityResultListener);
   }
 
